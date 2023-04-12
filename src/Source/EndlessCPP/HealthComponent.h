@@ -11,6 +11,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTookDamageDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRestoredHealthDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHealthChangedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDiedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInvincibilityTimerStarted);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInvincibilityTimerEndedDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ENDLESSCPP_API UHealthComponent : public UActorComponent
@@ -27,6 +29,7 @@ protected:
 
 	int CurrentHealth;
 	int MaxHealth;
+	bool CurrentlyInvincible = false;
 	
 public:	
 	// Called every frame
@@ -42,6 +45,10 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	int GetCurrentHealth();
+	UFUNCTION()
+	void StartInvincibilityTimer();
+	UFUNCTION()
+	void StopInvincibilityTimer();
 
 	UPROPERTY(BlueprintAssignable)
 	FTookDamageDelegate OnTookDamage;
@@ -54,5 +61,20 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FDiedDelegate OnDied;
+
+	UPROPERTY(BlueprintAssignable)
+	FInvincibilityTimerStarted OnInvincibilityStarted;
+	
+	UPROPERTY(BlueprintAssignable)
+	FInvincibilityTimerEndedDelegate OnInvincibilityEnded;
+
+	UPROPERTY(EditAnywhere)
+	float InvincibilityTime = 2;
+
+	FTimerHandle InvincibilityTimerHandle;
+	FTimerDelegate InvincibilityTimerDelegate;
+
+	UFUNCTION(BlueprintPure)
+	bool IsInvincible();
 	
 };

@@ -36,6 +36,11 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UHealthComponent::TakeDamage(int amount)
 {
+	if(CurrentlyInvincible) // I-frames
+	{
+		return;
+	}
+	
 	CurrentHealth -= amount;
 	CurrentHealth = FMath::Max(0, CurrentHealth); // prevent negative health
 	OnTookDamage.Broadcast();
@@ -43,6 +48,8 @@ void UHealthComponent::TakeDamage(int amount)
 	if(CurrentHealth <= 0)
 	{
 		Died();
+	} else {
+		StartInvincibilityTimer();
 	}
 
 	OnHealthChanged.Broadcast();
@@ -66,5 +73,29 @@ void UHealthComponent::Died()
 int UHealthComponent::GetCurrentHealth()
 {
 	return CurrentHealth;
+}
+
+void UHealthComponent::StartInvincibilityTimer()
+{
+	CurrentlyInvincible = true;
+	OnInvincibilityStarted.Broadcast();
+	InvincibilityTimerDelegate.BindUFunction(this, "StopInvincibilityTimer");
+	GetWorld()->GetTimerManager().SetTimer(InvincibilityTimerHandle, InvincibilityTimerDelegate, InvincibilityTime, false);
+
+	UE_LOG(LogTemp, Warning, TEXT("Invincibility started"));
+}
+
+void UHealthComponent::StopInvincibilityTimer()
+{
+	CurrentlyInvincible = false;
+	GetWorld()->GetTimerManager().ClearTimer(InvincibilityTimerHandle);
+	OnInvincibilityEnded.Broadcast();
+
+	UE_LOG(LogTemp, Warning, TEXT("Invincibility ended"));
+}
+
+bool UHealthComponent::IsInvincible()
+{
+	return CurrentlyInvincible;
 }
 
