@@ -20,7 +20,8 @@ void UHealthComponent::BeginPlay()
 	AEndlessGameMode* GameMod = (AEndlessGameMode*)GetWorld()->GetAuthGameMode();
 	CurrentHealth = GameMod->StartingPlayerHealth;
 	MaxHealth = GameMod->PlayerMaxHealth;
-	
+
+	OnHealthChanged.Broadcast(); // so the HUD updates 
 }
 
 

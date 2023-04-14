@@ -6,8 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "EndlessGameMode.generated.h"
 
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FScoreUpdatedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverTriggered);
 
 UCLASS()
 class ENDLESSCPP_API AEndlessGameMode : public AGameModeBase
@@ -22,17 +22,17 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int PlayerMaxHealth = 10;
-	
+
 	UPROPERTY(EditAnywhere)
 	float StartingSpeedFactor = 1.0;
 
 	UPROPERTY(EditAnywhere)
 	float SpeedFactorDivisionFactor = 500;
 
-	UPROPERTY(EditAnywhere, Category="Scoring")
+	UPROPERTY(EditAnywhere, Category = "Scoring")
 	float ScoreTickRate = 0.1f;
 
-	UPROPERTY(EditAnywhere, Category="Scoring")
+	UPROPERTY(EditAnywhere, Category = "Scoring")
 	int ScoreTickAmount = 1;
 
 	UFUNCTION(BlueprintCallable)
@@ -47,8 +47,10 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FScoreUpdatedDelegate OnScoreUpdatedDelegate;
 
-	virtual void BeginPlay() override;
+	UPROPERTY(BlueprintAssignable)
+	FGameOverTriggered OnGameOver;
 
+	virtual void BeginPlay() override;
 
 	bool GameOver = false;
 
@@ -59,5 +61,8 @@ public:
 	FTimerDelegate AddScoreDelegate;
 
 	// binding events https://forums.unrealengine.com/t/binding-events-in-c/36370/2
-	TScriptDelegate<FWeakObjectPtr> PlayerDiedDelegate; 
+	TScriptDelegate<FWeakObjectPtr> PlayerDiedDelegate;
+
+	UFUNCTION(BlueprintPure)
+	bool IsGameOver();
 };

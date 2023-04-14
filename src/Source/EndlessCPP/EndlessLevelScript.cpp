@@ -64,7 +64,7 @@ void AEndlessLevelScript::SpawnObstacleOrCollectible()
 
 	if(RandomThingsAndObstacles.Num() == 0)
 	{
-		return;
+		return; // no blueprints assigned
 	}
 
 	TArray<FVector> PossibleLocations;
