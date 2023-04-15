@@ -6,15 +6,10 @@
 TArray<int64> UEndlessBlueprintFunctions::TopScores(const TArray<int64> ScoresIn, const int TopAmount)
 {
 	TArray<int64> SortedArray;
+	SortedArray.Add(0);
 
 	for(auto & a : ScoresIn)
 	{
-		if(SortedArray.IsEmpty())
-		{
-			SortedArray.Add(a);
-			continue;
-		}
-
 		for(int i = 0; i < SortedArray.Num(); i++)
 		{
 			if(a > SortedArray[i])
@@ -23,8 +18,9 @@ TArray<int64> UEndlessBlueprintFunctions::TopScores(const TArray<int64> ScoresIn
 				break;
 			}
 		}
-		
 	}
+
+	SortedArray.Remove(0);
 	
 	// avoid returning 3 scores when there's only 1 etc.
 	int AmountToReturn = FMath::Min(SortedArray.Num(), TopAmount);
