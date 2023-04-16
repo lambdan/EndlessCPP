@@ -6,7 +6,13 @@
 TArray<int64> UEndlessBlueprintFunctions::TopScores(const TArray<int64> ScoresIn, const int TopAmount)
 {
 	TArray<int64> SortedArray;
+
+	// this is kind of a hack...
 	SortedArray.Add(0);
+	// ...but it works great and fixes the bug where the worst score wouldn't be shown if there were only n scores
+	// and the worst score was last. we remove this 0 score before returning the resulting array (to avoid showing
+	// scores with 0 on the menu)
+	
 
 	for(auto & a : ScoresIn)
 	{

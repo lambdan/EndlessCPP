@@ -81,8 +81,14 @@ void UHealthComponent::StartInvincibilityTimer()
 	CurrentlyInvincible = true;
 	OnInvincibilityStarted.Broadcast();
 	InvincibilityTimerDelegate.BindUFunction(this, "StopInvincibilityTimer");
-	GetWorld()->GetTimerManager().SetTimer(InvincibilityTimerHandle, InvincibilityTimerDelegate, InvincibilityTime, false);
+	GetWorld()->GetTimerManager().SetTimer(InvincibilityTimerHandle, InvincibilityTimerDelegate, InvincibilityDuration, false);
 
+	if(bFlashDuringInvincibility)
+	{
+		InvincibilityFlashingTimerDelegate.BindUFunction(this, "ToggleHidden");
+		GetWorld()->GetTimerManager().SetTimer(InvincibilityFlashingTimerHandle, InvincibilityFlashingTimerDelegate, InvincibilityFlashRate, true);
+	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("Invincibility started"));
 }
 
@@ -92,6 +98,12 @@ void UHealthComponent::StopInvincibilityTimer()
 	GetWorld()->GetTimerManager().ClearTimer(InvincibilityTimerHandle);
 	OnInvincibilityEnded.Broadcast();
 
+	if(bFlashDuringInvincibility)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(InvincibilityFlashingTimerHandle);
+		GetOwner()->SetActorHiddenInGame(false);
+	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("Invincibility ended"));
 }
 
@@ -100,3 +112,7 @@ bool UHealthComponent::IsInvincible()
 	return CurrentlyInvincible;
 }
 
+void UHealthComponent::ToggleHidden()
+{
+	GetOwner()->SetActorHiddenInGame(!GetOwner()->IsHidden());
+}

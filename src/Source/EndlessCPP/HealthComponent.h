@@ -30,6 +30,9 @@ protected:
 	int CurrentHealth;
 	int MaxHealth;
 	bool CurrentlyInvincible = false;
+
+	UPROPERTY(EditAnywhere)
+	bool bFlashDuringInvincibility = true;
 	
 public:	
 	// Called every frame
@@ -69,12 +72,20 @@ public:
 	FInvincibilityTimerEndedDelegate OnInvincibilityEnded;
 
 	UPROPERTY(EditAnywhere)
-	float InvincibilityTime = 2;
+	float InvincibilityDuration = 2;
+
+	UPROPERTY(EditAnywhere)
+	float InvincibilityFlashRate = 0.2f;
 
 	FTimerHandle InvincibilityTimerHandle;
 	FTimerDelegate InvincibilityTimerDelegate;
 
+	FTimerHandle InvincibilityFlashingTimerHandle;
+	FTimerDelegate InvincibilityFlashingTimerDelegate;
+
 	UFUNCTION(BlueprintPure)
 	bool IsInvincible();
-	
+
+	UFUNCTION()
+	void ToggleHidden();
 };

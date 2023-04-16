@@ -56,8 +56,6 @@ public:
 
 	AEndlessGameMode* GameMode;
 
-
-
 protected:
 	virtual void Tick(float DeltaSeconds) override;
 

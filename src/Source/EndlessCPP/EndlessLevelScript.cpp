@@ -20,15 +20,16 @@ void AEndlessLevelScript::BeginPlay()
 	SpawnedGroundPieces.Empty();
 	SpawnedObstaclesAndCollectibles.Empty();
 
-	// generate 10 starting pieces
+	// generate starting pieces
 	for (int i = 0; i < BlocksAheadOfPlayer; i++) {
 		SpawnGroundPiece(CalculateGroundPieceSpawnPosition());
+		
 	}
 }
 
 FVector AEndlessLevelScript::CalculateGroundPieceSpawnPosition()
 {
-	if (SpawnedGroundPieces.Num() == 0) { // first block (put it under the player)
+	if (SpawnedGroundPieces.IsEmpty()) { // first block (put it under the player)
 		return FVector(0,0,-150);
 	}
 	
@@ -62,10 +63,13 @@ void AEndlessLevelScript::SpawnGroundPiece(FVector Position)
 void AEndlessLevelScript::SpawnObstacleOrCollectible()
 {
 
-	if(RandomThingsAndObstacles.Num() == 0)
+	LastObstacleOrCollectibleSpawn = GetGameTimeSinceCreation();
+	
+	if(RandomThingsAndObstacles.IsEmpty())
 	{
 		return; // no blueprints assigned
 	}
+	
 
 	TArray<FVector> PossibleLocations;
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 0, 150)); // middle
@@ -99,9 +103,9 @@ void AEndlessLevelScript::SpawnObstacleOrCollectible()
 
 void AEndlessLevelScript::SpawnEnemy()
 {
-	if(EnemyBlueprints.Num() == 0)
+	if(EnemyBlueprints.IsEmpty())
 	{
-		return;
+		return; // no enemy blueprints assigned
 	}
 	
 	TArray<FVector> PossibleLocations;
@@ -109,9 +113,8 @@ void AEndlessLevelScript::SpawnEnemy()
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, -600, 400));
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 400, 400));
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 600, 400));
-
-	auto HowManyToSpawn = 1; // could be made random in the future
-	for (int i = 0; i < HowManyToSpawn; i++)
+	
+	if(FMath::RandBool())
 	{
 		auto LocationIndex = FMath::RandRange(0, PossibleLocations.Num()-1);
 		auto Location = PossibleLocations[LocationIndex];
@@ -127,69 +130,62 @@ void AEndlessLevelScript::SpawnEnemy()
 			UE_LOG(LogTemp, Warning, TEXT("Spawned %s"), *NewSpawn->GetActorNameOrLabel());
 			PossibleLocations.RemoveAt(LocationIndex);
 		}
-		
 	}
+	
 }
-
 
 
 void AEndlessLevelScript::Tick(float DeltaSeconds)
 {
+	Super::Tick(DeltaSeconds);
 	// check distance to player, if we're approaching the last piece: create new one
 	auto LastPieceLocation = SpawnedGroundPieces.Last()->GetActorLocation();
-	auto PlayerLocation = FVector(0,0,0); // player should always be at 0,0,0 anyway
-	auto DistanceBetween = FVector::Distance(LastPieceLocation, PlayerLocation);
-	if (DistanceBetween < (BlocksAheadOfPlayer*BlockLength)) {
-		// TODO: math based on spawnedgroundpieces num (eg 40000 here and .Num() > 50 means 10 pieces will be behind player at all times
+	const auto DistanceToPlayer = LastPieceLocation.X; // player is always at X = 0
+	if (DistanceToPlayer < (BlocksAheadOfPlayer * BlockLength))
+	{
 		SpawnGroundPiece(CalculateGroundPieceSpawnPosition());
 	}
 
 	// move ground towards the player
-	for(int i = 0; i < SpawnedGroundPieces.Num(); i++)
+	for (int i = 0; i < SpawnedGroundPieces.Num(); i++)
 	{
 		SpawnedGroundPieces[i]->AddActorWorldOffset(GroundMovementEveryTick * GameMode->GetSpeedFactor());
 	}
 
 	// move collectibles/obstacles towards player
-	for(int i = 0; i < SpawnedObstaclesAndCollectibles.Num(); i++)
+	for (int i = 0; i < SpawnedObstaclesAndCollectibles.Num(); i++)
 	{
-		if(SpawnedObstaclesAndCollectibles[i] == nullptr)
+		if (SpawnedObstaclesAndCollectibles[i] == nullptr)
 		{
-			UE_LOG(LogTemp, Error, TEXT("Collectible was NULL! Removing it from array... hopefully"));
 			SpawnedObstaclesAndCollectibles.RemoveAt(i);
-			UE_LOG(LogTemp, Error, TEXT("Removed!"));
 			continue;
 		}
-		
+
 		SpawnedObstaclesAndCollectibles[i]->AddActorWorldOffset(GroundMovementEveryTick * GameMode->GetSpeedFactor());
 
-		// check if behind player (remove it if so)
-		if(SpawnedObstaclesAndCollectibles[i]->GetActorLocation().X <= -500)
+		// check if object is behind player (remove it if so)
+		if (SpawnedObstaclesAndCollectibles[i]->GetActorLocation().X <= -500)
 		{
-			UE_LOG(LogTemp, Error, TEXT("Behind player, removing"));
 			SpawnedObstaclesAndCollectibles[i]->Destroy();
 			SpawnedObstaclesAndCollectibles.RemoveAt(i);
 		}
 	}
-	
-	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Yellow, FString::Printf(TEXT("Ground pieces in array: %i"), SpawnedGroundPieces.Num()));
-	GEngine->AddOnScreenDebugMessage(3, 1, FColor::Yellow, FString::Printf(TEXT("Collectibles/obstacles in array: %i"), SpawnedObstaclesAndCollectibles.Num()));
-	
-	// AEndlessGameMode * GameMode = (AEndlessGameMode*)GetWorld()->GetAuthGameMode();
-	// if(GameMode->GetScore() % 10 == 0)
-	// {
-	// 	SpawnObstacleOrCollectible();
-	// 	
-	// }
 
-	if(GetGameTimeSinceCreation() - LastObstacleOrCollectibleSpawn > (1 / GameMode->GetSpeedFactor()))
+
+	if (GetGameTimeSinceCreation() - LastObstacleOrCollectibleSpawn > (1 / GameMode->GetSpeedFactor()))
 	{
-		LastObstacleOrCollectibleSpawn = GetGameTimeSinceCreation();
+		
 		SpawnObstacleOrCollectible();
 		SpawnEnemy();
 		// SpeedFactor += 0.01;
 	}
-	
-	GEngine->AddOnScreenDebugMessage(4, 1, FColor::Yellow, FString::Printf(TEXT("Speed factor: %f"), GameMode->GetSpeedFactor()));
-	Super::Tick(DeltaSeconds);
+
+	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Yellow,
+	                                 FString::Printf(TEXT("Ground pieces in array: %i"), SpawnedGroundPieces.Num()));
+	GEngine->AddOnScreenDebugMessage(3, 1, FColor::Yellow,
+	                                 FString::Printf(
+		                                 TEXT("Collectibles/obstacles in array: %i"),
+		                                 SpawnedObstaclesAndCollectibles.Num()));
+	GEngine->AddOnScreenDebugMessage(4, 1, FColor::Yellow,
+	                                 FString::Printf(TEXT("Speed factor: %f"), GameMode->GetSpeedFactor()));
 }
