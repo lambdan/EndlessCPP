@@ -88,4 +88,7 @@ public:
 
 	UFUNCTION()
 	void ToggleHidden();
+
+	UFUNCTION(BlueprintPure)
+	int GetMaxHealth();
 };

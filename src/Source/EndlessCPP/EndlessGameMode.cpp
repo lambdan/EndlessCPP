@@ -36,7 +36,8 @@ void AEndlessGameMode::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(AddScoreHandle, AddScoreDelegate, ScoreTickRate, true);
 
 	// bind death event
-	auto PlayerHealth = Cast<UHealthComponent>(GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator()->GetComponentByClass(UHealthComponent::StaticClass()));
+	PlayerHealth = Cast<UHealthComponent>(GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator()->GetComponentByClass(UHealthComponent::StaticClass()));
+	check(PlayerHealth!=nullptr);
 	PlayerDiedDelegate.BindUFunction(this, "PlayerDied");
 	PlayerHealth->OnDied.Add(PlayerDiedDelegate);
 }
@@ -56,4 +57,9 @@ void AEndlessGameMode::PlayerDied()
 bool AEndlessGameMode::IsGameOver()
 {
 	return GameOver;
+}
+
+bool AEndlessGameMode::PlayerIsHurt()
+{
+	return PlayerHealth->GetCurrentHealth() < PlayerHealth->GetMaxHealth();
 }

@@ -65,7 +65,7 @@ void AEndlessLevelScript::SpawnObstacleOrCollectible()
 
 	LastObstacleOrCollectibleSpawn = GetGameTimeSinceCreation();
 	
-	if(RandomThingsAndObstacles.IsEmpty())
+	if(ObstacleBlueprints.IsEmpty())
 	{
 		return; // no blueprints assigned
 	}
@@ -88,8 +88,29 @@ void AEndlessLevelScript::SpawnObstacleOrCollectible()
 		FTransform SpawnTransform = FTransform(Location);
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		auto RandomInt = FMath::RandRange(0, RandomThingsAndObstacles.Num() - 1);
-		auto RandomizedThing = RandomThingsAndObstacles[RandomInt];
+
+		int32 RandomInt;
+		TSubclassOf<AActor> RandomizedThing;
+		auto rng = FMath::RandRange(0.0f, 1.0f);
+		if(rng < 0.3f)
+		{
+			// spawn collectible
+			if(GameMode->PlayerIsHurt())
+			{
+				RandomInt = FMath::RandRange(0, HealthBlueprints.Num() - 1);
+				RandomizedThing = HealthBlueprints[RandomInt];
+			} else
+			{
+				RandomInt = FMath::RandRange(0, CollectibleBlueprints.Num() - 1);
+				RandomizedThing = CollectibleBlueprints[RandomInt];
+			}
+		} else
+		{
+			// spawn obstacle
+			RandomInt = FMath::RandRange(0, ObstacleBlueprints.Num() - 1);
+			RandomizedThing = ObstacleBlueprints[RandomInt];
+		}
+		
 		auto NewSpawn = GetWorld()->SpawnActor<AActor>(RandomizedThing, SpawnTransform, SpawnParams);
 		if(NewSpawn)
 		{
@@ -166,6 +187,7 @@ void AEndlessLevelScript::Tick(float DeltaSeconds)
 		// check if object is behind player (remove it if so)
 		if (SpawnedObstaclesAndCollectibles[i]->GetActorLocation().X <= -500)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("%s is behind player. Destroying"), *SpawnedObstaclesAndCollectibles[i]->GetActorNameOrLabel());
 			SpawnedObstaclesAndCollectibles[i]->Destroy();
 			SpawnedObstaclesAndCollectibles.RemoveAt(i);
 		}

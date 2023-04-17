@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "HealthComponent.h"
 #include "GameFramework/GameModeBase.h"
 #include "EndlessGameMode.generated.h"
 
@@ -65,4 +66,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool IsGameOver();
+
+	UFUNCTION(BlueprintPure)
+	bool PlayerIsHurt();
+
+	UHealthComponent* PlayerHealth;
 };

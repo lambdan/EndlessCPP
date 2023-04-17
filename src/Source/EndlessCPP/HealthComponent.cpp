@@ -116,3 +116,8 @@ void UHealthComponent::ToggleHidden()
 {
 	GetOwner()->SetActorHiddenInGame(!GetOwner()->IsHidden());
 }
+
+int UHealthComponent::GetMaxHealth()
+{
+	return MaxHealth;
+}

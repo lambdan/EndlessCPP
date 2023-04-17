@@ -23,7 +23,13 @@ public:
 	TSubclassOf<AActor> GroundPieceBlueprint;
 
 	UPROPERTY(EditAnywhere)
-	TArray<TSubclassOf<AActor>> RandomThingsAndObstacles;
+	TArray<TSubclassOf<AActor>> ObstacleBlueprints;
+
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<AActor>> CollectibleBlueprints;
+
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<AActor>> HealthBlueprints;
 
 	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<AActor>> EnemyBlueprints;
@@ -55,6 +61,7 @@ public:
 	void SpawnEnemy();
 
 	AEndlessGameMode* GameMode;
+	
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;
