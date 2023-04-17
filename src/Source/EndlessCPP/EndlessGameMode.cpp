@@ -3,6 +3,7 @@
 #include "EndlessGameMode.h"
 
 #include "HealthComponent.h"
+#include "WorldMover.h"
 #include "Kismet/GameplayStatics.h"
 
 void AEndlessGameMode::AddScore(int amount)
@@ -40,6 +41,7 @@ void AEndlessGameMode::BeginPlay()
 	check(PlayerHealth!=nullptr);
 	PlayerDiedDelegate.BindUFunction(this, "PlayerDied");
 	PlayerHealth->OnDied.Add(PlayerDiedDelegate);
+	
 }
 
 void AEndlessGameMode::PlayerDied()
@@ -63,3 +65,16 @@ bool AEndlessGameMode::PlayerIsHurt()
 {
 	return PlayerHealth->GetCurrentHealth() < PlayerHealth->GetMaxHealth();
 }
+
+AWorldMover* AEndlessGameMode::GetWorldMover()
+{
+	return WorldMover;
+}
+
+void AEndlessGameMode::SetWorldMover(AWorldMover* NewWorldMover)
+{
+	WorldMover = NewWorldMover;
+}
+
+
+

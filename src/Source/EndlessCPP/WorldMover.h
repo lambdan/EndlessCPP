@@ -3,21 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/LevelScriptActor.h"
+#include "GameFramework/Actor.h"
 #include "EndlessGameMode.h"
-#include "EndlessLevelScript.generated.h"
+#include "WorldMover.generated.h"
 
-/**
- * 
- */
+
+
 UCLASS()
-class ENDLESSCPP_API AEndlessLevelScript : public ALevelScriptActor
+class ENDLESSCPP_API AWorldMover : public AActor
 {
 	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AWorldMover();
 
-public:
-	AEndlessLevelScript();
+protected:
+	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> GroundPieceBlueprint;
@@ -61,9 +68,8 @@ public:
 	void SpawnEnemy();
 
 	AEndlessGameMode* GameMode;
-	
 
-protected:
-	virtual void Tick(float DeltaSeconds) override;
+	UFUNCTION(BlueprintCallable)
+	void AddActorToMoveWithWorld(AActor* NewActor);
 
 };

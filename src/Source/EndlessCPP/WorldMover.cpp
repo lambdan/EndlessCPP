@@ -1,21 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "EndlessLevelScript.h"
-#include <Engine/World.h>
+#include "WorldMover.h"
 
-#include "EndlessGameMode.h"
-
-
-AEndlessLevelScript::AEndlessLevelScript() {
+// Sets default values
+AWorldMover::AWorldMover()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
 }
 
-void AEndlessLevelScript::BeginPlay()
+void AWorldMover::BeginPlay()
 {
 	Super::BeginPlay();
 
 	GameMode = (AEndlessGameMode*)GetWorld()->GetAuthGameMode();
+	GameMode->SetWorldMover(this);
 	
 	SpawnedGroundPieces.Empty();
 	SpawnedObstaclesAndCollectibles.Empty();
@@ -27,7 +28,7 @@ void AEndlessLevelScript::BeginPlay()
 	}
 }
 
-FVector AEndlessLevelScript::CalculateGroundPieceSpawnPosition()
+FVector AWorldMover::CalculateGroundPieceSpawnPosition()
 {
 	if (SpawnedGroundPieces.IsEmpty()) { // first block (put it under the player)
 		return FVector(0,0,-150);
@@ -40,7 +41,7 @@ FVector AEndlessLevelScript::CalculateGroundPieceSpawnPosition()
 	return Result;
 }
 
-void AEndlessLevelScript::SpawnGroundPiece(FVector Position)
+void AWorldMover::SpawnGroundPiece(FVector Position)
 {
 	// when we have a bunch of pieces behind us we can just move them ahead of us instead of spawning new ones
 	if(SpawnedGroundPieces.Num() >= (BlocksAheadOfPlayer+BlocksBehindPlayer)) 
@@ -60,7 +61,7 @@ void AEndlessLevelScript::SpawnGroundPiece(FVector Position)
 	}
 }
 
-void AEndlessLevelScript::SpawnObstacleOrCollectible()
+void AWorldMover::SpawnObstacleOrCollectible()
 {
 
 	LastObstacleOrCollectibleSpawn = GetGameTimeSinceCreation();
@@ -122,7 +123,7 @@ void AEndlessLevelScript::SpawnObstacleOrCollectible()
 	}
 }
 
-void AEndlessLevelScript::SpawnEnemy()
+void AWorldMover::SpawnEnemy()
 {
 	if(EnemyBlueprints.IsEmpty())
 	{
@@ -156,7 +157,12 @@ void AEndlessLevelScript::SpawnEnemy()
 }
 
 
-void AEndlessLevelScript::Tick(float DeltaSeconds)
+void AWorldMover::AddActorToMoveWithWorld(AActor* NewActor)
+{
+	SpawnedObstaclesAndCollectibles.Add(NewActor);
+}
+
+void AWorldMover::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	// check distance to player, if we're approaching the last piece: create new one

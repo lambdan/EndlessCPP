@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "HealthComponent.h"
+// #include "WorldMover.h"
 #include "GameFramework/GameModeBase.h"
 #include "EndlessGameMode.generated.h"
+
+class WorldMover;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FScoreUpdatedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverTriggered);
@@ -70,5 +73,11 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool PlayerIsHurt();
 
+	UFUNCTION(BlueprintPure)
+	AWorldMover* GetWorldMover();
+
 	UHealthComponent* PlayerHealth;
+	AWorldMover* WorldMover;
+
+	void SetWorldMover(AWorldMover* NewWorldMover);
 };
