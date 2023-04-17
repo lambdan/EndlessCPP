@@ -161,7 +161,7 @@ void AEndlessLevelScript::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	// check distance to player, if we're approaching the last piece: create new one
 	auto LastPieceLocation = SpawnedGroundPieces.Last()->GetActorLocation();
-	const auto DistanceToPlayer = LastPieceLocation.X; // player is always at X = 0
+	auto DistanceToPlayer = LastPieceLocation.X; // player is always at X = 0
 	if (DistanceToPlayer < (BlocksAheadOfPlayer * BlockLength))
 	{
 		SpawnGroundPiece(CalculateGroundPieceSpawnPosition());
