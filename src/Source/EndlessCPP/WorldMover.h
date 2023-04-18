@@ -43,6 +43,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FVector GroundMovementEveryTick = FVector(-15,0,0);
+
+	UPROPERTY(EditAnywhere)
+	float CollectibleSpawnProbability = 0.3f;
+
+	UPROPERTY(EditAnywhere)
+	float EnemySpawnProbability = 0.1f;
 	
 	UPROPERTY(EditAnywhere)
 	int BlocksBehindPlayer = 10;

@@ -92,8 +92,7 @@ void AWorldMover::SpawnObstacleOrCollectible()
 
 		int32 RandomInt;
 		TSubclassOf<AActor> RandomizedThing;
-		auto rng = FMath::RandRange(0.0f, 1.0f);
-		if(rng < 0.3f)
+		if(FMath::RandRange(0.0f, 1.0f) <= CollectibleSpawnProbability)
 		{
 			// spawn collectible
 			if(GameMode->PlayerIsHurt())
@@ -125,9 +124,9 @@ void AWorldMover::SpawnObstacleOrCollectible()
 
 void AWorldMover::SpawnEnemy()
 {
-	if(EnemyBlueprints.IsEmpty())
+	if(EnemyBlueprints.IsEmpty() || FMath::RandRange(0.0f, 1.0f) <= EnemySpawnProbability)
 	{
-		return; // no enemy blueprints assigned
+		return; // no enemy blueprints assigned or probability not hit
 	}
 	
 	TArray<FVector> PossibleLocations;
@@ -135,23 +134,21 @@ void AWorldMover::SpawnEnemy()
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, -600, 400));
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 400, 400));
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 600, 400));
-	
-	if(FMath::RandBool())
+
+
+	auto LocationIndex = FMath::RandRange(0, PossibleLocations.Num() - 1);
+	auto Location = PossibleLocations[LocationIndex];
+	FTransform SpawnTransform = FTransform(Location);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	auto RandomInt = FMath::RandRange(0, EnemyBlueprints.Num() - 1);
+	auto RandomizedThing = EnemyBlueprints[RandomInt];
+	auto NewSpawn = GetWorld()->SpawnActor<AActor>(RandomizedThing, SpawnTransform, SpawnParams);
+	if (NewSpawn)
 	{
-		auto LocationIndex = FMath::RandRange(0, PossibleLocations.Num()-1);
-		auto Location = PossibleLocations[LocationIndex];
-		FTransform SpawnTransform = FTransform(Location);
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		auto RandomInt = FMath::RandRange(0, EnemyBlueprints.Num() - 1);
-		auto RandomizedThing = EnemyBlueprints[RandomInt];
-		auto NewSpawn = GetWorld()->SpawnActor<AActor>(RandomizedThing, SpawnTransform, SpawnParams);
-		if(NewSpawn)
-		{
-			SpawnedObstaclesAndCollectibles.Add(NewSpawn);
-			UE_LOG(LogTemp, Warning, TEXT("Spawned %s"), *NewSpawn->GetActorNameOrLabel());
-			PossibleLocations.RemoveAt(LocationIndex);
-		}
+		SpawnedObstaclesAndCollectibles.Add(NewSpawn);
+		UE_LOG(LogTemp, Warning, TEXT("Spawned %s"), *NewSpawn->GetActorNameOrLabel());
+		PossibleLocations.RemoveAt(LocationIndex);
 	}
 	
 }
