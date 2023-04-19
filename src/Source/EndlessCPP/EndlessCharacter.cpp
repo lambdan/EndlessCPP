@@ -39,14 +39,14 @@ void AEndlessCharacter::ReceiveDamage_Implementation(AActor* DamageCauser, int D
 {
 	IIDamageable::ReceiveDamage_Implementation(DamageCauser, DamageAmount);
 	HealthComponent->TakeDamage(DamageAmount);
-	UE_LOG(LogTemp, Error, TEXT("Took damage in code"));
+	// UE_LOG(LogTemp, Error, TEXT("Took damage in code"));
 }
 
 void AEndlessCharacter::ReceiveHeal_Implementation(int HealAmount)
 {
 	IIHealable::ReceiveHeal_Implementation(HealAmount);
 	HealthComponent->RestoreHealth(HealAmount);
-	UE_LOG(LogTemp, Error, TEXT("Healed in code"));
+	// UE_LOG(LogTemp, Error, TEXT("Healed in code"));
 }
 
 void AEndlessCharacter::MoveLeft()
@@ -56,7 +56,7 @@ void AEndlessCharacter::MoveLeft()
 	{
 		NewLocation.Y = -150;
 	}
-	if(NewLocation.Y == 150)
+	else if(NewLocation.Y == 150)
 	{
 		NewLocation.Y = 0;
 	}
@@ -70,7 +70,7 @@ void AEndlessCharacter::MoveRight()
 	{
 		NewLocation.Y = 150;
 	}
-	if(NewLocation.Y == -150)
+	else if(NewLocation.Y == -150)
 	{
 		NewLocation.Y = 0;
 	}
