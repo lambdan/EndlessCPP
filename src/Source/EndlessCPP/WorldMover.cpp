@@ -1,20 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Yes, this class should really be called WorldManager or something....
 
 #include "WorldMover.h"
 
-// Sets default values
 AWorldMover::AWorldMover()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 }
 
 void AWorldMover::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	GameMode = (AEndlessGameMode*)GetWorld()->GetAuthGameMode();
 	GameMode->SetWorldMover(this);
 	
@@ -24,7 +21,6 @@ void AWorldMover::BeginPlay()
 	// generate starting pieces
 	for (int i = 0; i < BlocksAheadOfPlayer; i++) {
 		SpawnGroundPiece(CalculateGroundPieceSpawnPosition());
-		
 	}
 }
 
@@ -124,7 +120,7 @@ void AWorldMover::SpawnObstacleOrCollectible()
 
 void AWorldMover::SpawnEnemy()
 {
-	if(EnemyBlueprints.IsEmpty() || FMath::RandRange(0.0f, 1.0f) <= EnemySpawnProbability)
+	if(EnemyBlueprints.IsEmpty() || FMath::RandRange(0.0f, 1.0f) >= EnemySpawnProbability)
 	{
 		return; // no enemy blueprints assigned or probability not hit
 	}
@@ -159,6 +155,8 @@ void AWorldMover::AddActorToMoveWithWorld(AActor* NewActor)
 	SpawnedObstaclesAndCollectibles.Add(NewActor);
 }
 
+
+
 void AWorldMover::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -168,12 +166,13 @@ void AWorldMover::Tick(float DeltaSeconds)
 	if (DistanceToPlayer < (BlocksAheadOfPlayer * BlockLength))
 	{
 		SpawnGroundPiece(CalculateGroundPieceSpawnPosition());
+
 	}
 
 	// move ground towards the player
 	for (int i = 0; i < SpawnedGroundPieces.Num(); i++)
 	{
-		SpawnedGroundPieces[i]->AddActorWorldOffset(GroundMovementEveryTick * GameMode->GetSpeedFactor());
+		SpawnedGroundPieces[i]->AddActorWorldOffset(FVector(-GameMode->GetWorldMoveAmount(),0,0) * GameMode->GetSpeedFactor());
 	}
 
 	// move collectibles/obstacles towards player
@@ -185,7 +184,7 @@ void AWorldMover::Tick(float DeltaSeconds)
 			continue;
 		}
 
-		SpawnedObstaclesAndCollectibles[i]->AddActorWorldOffset(GroundMovementEveryTick * GameMode->GetSpeedFactor());
+		SpawnedObstaclesAndCollectibles[i]->AddActorWorldOffset(FVector(-GameMode->GetWorldMoveAmount(),0,0) * GameMode->GetSpeedFactor());
 
 		// check if object is behind player (remove it if so)
 		if (SpawnedObstaclesAndCollectibles[i]->GetActorLocation().X <= -500)
@@ -197,12 +196,10 @@ void AWorldMover::Tick(float DeltaSeconds)
 	}
 
 
-	if (GetGameTimeSinceCreation() - LastObstacleOrCollectibleSpawn > (1 / GameMode->GetSpeedFactor()))
+	if (GetGameTimeSinceCreation() - LastObstacleOrCollectibleSpawn > (1 * GameMode->GetStartingSpeedFactor() / GameMode->GetSpeedFactor()))
 	{
-		
 		SpawnObstacleOrCollectible();
 		SpawnEnemy();
-		// SpeedFactor += 0.01;
 	}
 
 	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Yellow,

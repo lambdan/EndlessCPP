@@ -16,7 +16,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverTriggered);
 UCLASS()
 class ENDLESSCPP_API AEndlessGameMode : public AGameModeBase
 {
+	AEndlessGameMode();
 	GENERATED_BODY()
+
+
+protected:
+	float CurrentSpeedFactor;
 
 public:
 	int64 Score = 0; // int64 in case someone goes for a guiness world record
@@ -25,13 +30,13 @@ public:
 	int StartingPlayerHealth = 3;
 
 	UPROPERTY(EditAnywhere)
-	int PlayerMaxHealth = 10;
+	int PlayerMaxHealth = 3;
 
 	UPROPERTY(EditAnywhere)
 	float StartingSpeedFactor = 1.0;
-
+	
 	UPROPERTY(EditAnywhere)
-	float SpeedFactorDivisionFactor = 500;
+	float SpeedFactorDivisionFactor = 200;
 
 	UPROPERTY(EditAnywhere, Category = "Scoring")
 	float ScoreTickRate = 0.1f;
@@ -55,6 +60,7 @@ public:
 	FGameOverTriggered OnGameOver;
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	bool GameOver = false;
 
@@ -80,4 +86,22 @@ public:
 	AWorldMover* WorldMover;
 
 	void SetWorldMover(AWorldMover* NewWorldMover);
+
+	UFUNCTION(BlueprintCallable)
+	void SetSpeedFactor(float NewSpeedFactor);
+
+	UFUNCTION(BlueprintCallable)
+	void ReduceSpeed(float Factor);
+
+	UPROPERTY(EditAnywhere)
+	float WorldMoveAmount = 30;
+
+	UFUNCTION(BlueprintPure)
+	float GetWorldMoveAmount();
+
+	UFUNCTION(BlueprintPure)
+	float GetKilometersPerHour();
+
+	UFUNCTION(BlueprintPure)
+	float GetStartingSpeedFactor();
 };

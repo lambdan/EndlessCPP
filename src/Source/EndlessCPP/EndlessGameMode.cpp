@@ -6,6 +6,11 @@
 #include "WorldMover.h"
 #include "Kismet/GameplayStatics.h"
 
+AEndlessGameMode::AEndlessGameMode()
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
+
 void AEndlessGameMode::AddScore(int amount)
 {
 	if (GameOver)
@@ -23,14 +28,27 @@ int64 AEndlessGameMode::GetScore()
 
 float AEndlessGameMode::GetSpeedFactor()
 {
-	return StartingSpeedFactor + (GetGameTimeSinceCreation() / SpeedFactorDivisionFactor);
+	return CurrentSpeedFactor;
+	// return StartingSpeedFactor + (GetGameTimeSinceCreation() / SpeedFactorDivisionFactor);
 }
+
+void AEndlessGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if(!PlayerIsHurt())
+	{
+		CurrentSpeedFactor += (DeltaSeconds / SpeedFactorDivisionFactor);
+	}
+	
+}
+
 
 void AEndlessGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	Score = 0;
 	GameOver = false;
+	CurrentSpeedFactor = StartingSpeedFactor;
 
 	// bind score ticker (add score every sec)
 	AddScoreDelegate.BindUFunction(this, "AddScore", ScoreTickAmount);
@@ -76,5 +94,32 @@ void AEndlessGameMode::SetWorldMover(AWorldMover* NewWorldMover)
 	WorldMover = NewWorldMover;
 }
 
+void AEndlessGameMode::SetSpeedFactor(float NewSpeedFactor)
+{
+	CurrentSpeedFactor = NewSpeedFactor;
+}
 
+void AEndlessGameMode::ReduceSpeed(float Factor)
+{
+	CurrentSpeedFactor -= (CurrentSpeedFactor - StartingSpeedFactor) / Factor;
+	CurrentSpeedFactor = FMath::Max(StartingSpeedFactor, CurrentSpeedFactor); // never go below starting speed
+}
+
+float AEndlessGameMode::GetWorldMoveAmount()
+{
+	return WorldMoveAmount;
+}
+
+float AEndlessGameMode::GetKilometersPerHour()
+{
+	// TODO double check this math...
+	auto TicksPerHour = (1/WorldMover->GetActorTickInterval()) * 60 * 60;
+	auto CMperHour = (GetSpeedFactor() * GetWorldMoveAmount()) * TicksPerHour;
+	return CMperHour/100000;
+}
+
+float AEndlessGameMode::GetStartingSpeedFactor()
+{
+	return StartingSpeedFactor;
+}
 

@@ -40,10 +40,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<AActor>> EnemyBlueprints;
-
-	UPROPERTY(EditAnywhere)
-	FVector GroundMovementEveryTick = FVector(-15,0,0);
-
+	
 	UPROPERTY(EditAnywhere)
 	float CollectibleSpawnProbability = 0.3f;
 
@@ -77,5 +74,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddActorToMoveWithWorld(AActor* NewActor);
+
+
 
 };
