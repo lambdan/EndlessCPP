@@ -40,3 +40,10 @@ TArray<int64> UEndlessBlueprintFunctions::TopScores(const TArray<int64> ScoresIn
 	return ResultArray;
 	
 }
+
+FString UEndlessBlueprintFunctions::FloatToString(const float FloatIn)
+{
+	return FString::Printf(TEXT("%.1f"), FloatIn);
+}
+
+

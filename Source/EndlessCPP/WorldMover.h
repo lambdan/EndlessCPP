@@ -23,9 +23,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> GroundPieceBlueprint;
 
@@ -60,7 +57,7 @@ public:
 	TArray<AActor*> SpawnedGroundPieces;
 
 	UPROPERTY()
-	TArray<AActor*> SpawnedObstaclesAndCollectibles;
+	TArray<AActor*> SpawnedObjects;
 
 	UPROPERTY()
 	float LastObstacleOrCollectibleSpawn;
@@ -75,6 +72,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddActorToMoveWithWorld(AActor* NewActor);
 
+	UFUNCTION()
+	void MoveWorld();
+
+	FTimerHandle WorldMoveTimerHandle;
+	FTimerDelegate WorldMoveTimerDelegate;
 
 
 };

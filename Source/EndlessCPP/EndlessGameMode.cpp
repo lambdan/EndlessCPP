@@ -17,7 +17,14 @@ void AEndlessGameMode::AddScore(int amount)
 	{
 		return;
 	}
+	
 	Score += (amount * GetSpeedFactor());
+
+	if(!PlayerIsHurt())
+	{
+		CurrentSpeedFactor += (1 / SpeedFactorDivisionFactor);
+	}
+	
 	OnScoreUpdatedDelegate.Broadcast();
 }
 
@@ -35,10 +42,7 @@ float AEndlessGameMode::GetSpeedFactor()
 void AEndlessGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	if(!PlayerIsHurt())
-	{
-		CurrentSpeedFactor += (DeltaSeconds / SpeedFactorDivisionFactor);
-	}
+
 	
 }
 
@@ -112,10 +116,7 @@ float AEndlessGameMode::GetWorldMoveAmount()
 
 float AEndlessGameMode::GetKilometersPerHour()
 {
-	// TODO double check this math...
-	auto TicksPerHour = (1/WorldMover->GetActorTickInterval()) * 60 * 60;
-	auto CMperHour = (GetSpeedFactor() * GetWorldMoveAmount()) * TicksPerHour;
-	return CMperHour/100000;
+	return ((GetSpeedFactor() * GetWorldMoveAmount()) * ((1 / WorldMoveTickrate) * 60 * 60)) / 100000;
 }
 
 float AEndlessGameMode::GetStartingSpeedFactor()

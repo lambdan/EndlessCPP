@@ -16,4 +16,7 @@ class ENDLESSCPP_API UEndlessBlueprintFunctions : public UBlueprintFunctionLibra
 	
 	UFUNCTION(BlueprintPure)
 	static TArray<int64> TopScores(const TArray<int64> ScoresIn, const int TopAmount);
+
+	UFUNCTION(BlueprintPure)
+	static FString FloatToString(const float FloatIn);
 };

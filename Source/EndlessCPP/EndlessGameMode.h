@@ -32,10 +32,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	int PlayerMaxHealth = 3;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Speed")
 	float StartingSpeedFactor = 1.0;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Speed")
 	float SpeedFactorDivisionFactor = 200;
 
 	UPROPERTY(EditAnywhere, Category = "Scoring")
@@ -43,6 +43,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Scoring")
 	int ScoreTickAmount = 1;
+
+	UPROPERTY(EditAnywhere, Category = "Speed")
+	float WorldMoveTickrate = 1.0 / 100.0;
 
 	UFUNCTION(BlueprintCallable)
 	void AddScore(int amount);
