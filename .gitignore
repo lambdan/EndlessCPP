@@ -1,4 +1,7 @@
-# Visual Studio 2015 user specific files
+# Symbol files
+*.pdb
+
+# IDE files
 .vs/
 .vscode/
 .idea/
