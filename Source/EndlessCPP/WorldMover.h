@@ -22,6 +22,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	int BlockLength = 0;
+
 public:	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> GroundPieceBlueprint;
@@ -49,9 +51,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int BlocksAheadOfPlayer = 40;
-
-	UPROPERTY(EditAnywhere)
-	int BlockLength = 1000;
+	
+	
 	
 	UPROPERTY()
 	TArray<AActor*> SpawnedGroundPieces;

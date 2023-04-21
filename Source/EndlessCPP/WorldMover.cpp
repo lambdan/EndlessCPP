@@ -18,12 +18,13 @@ void AWorldMover::BeginPlay()
 	
 	SpawnedGroundPieces.Empty();
 	SpawnedObjects.Empty();
+	
 
 	// generate starting pieces
 	for (int i = 0; i < BlocksAheadOfPlayer; i++) {
 		SpawnGroundPiece(CalculateGroundPieceSpawnPosition());
 	}
-
+	
 	WorldMoveTimerDelegate.BindUFunction(this, "MoveWorld");
 	GetWorld()->GetTimerManager().SetTimer(WorldMoveTimerHandle, WorldMoveTimerDelegate, GameMode->WorldMoveTickrate, true);
 }
@@ -57,6 +58,12 @@ void AWorldMover::SpawnGroundPiece(FVector Position)
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		auto NewPiece = GetWorld()->SpawnActor<AActor>(GroundPieceBlueprint, SpawnTransform, SpawnParams);
+		
+		if(BlockLength==0)
+		{
+			BlockLength = NewPiece->GetActorScale().X * 100;
+		}
+		
 		SpawnedGroundPieces.Add(NewPiece);
 	}
 }
