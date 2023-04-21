@@ -141,7 +141,6 @@ void AWorldMover::SpawnEnemy()
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 400, 400));
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 600, 400));
 
-
 	auto LocationIndex = FMath::RandRange(0, PossibleLocations.Num() - 1);
 	auto Location = PossibleLocations[LocationIndex];
 	FTransform SpawnTransform = FTransform(Location);
