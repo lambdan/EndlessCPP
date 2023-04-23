@@ -21,7 +21,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	int PositionIndex = 0; // -1 is left, 1 is right, 0 is center
 
 public:	
 	// Called every frame

@@ -52,28 +52,16 @@ void AEndlessCharacter::ReceiveHeal_Implementation(int HealAmount)
 void AEndlessCharacter::MoveLeft()
 {
 	auto NewLocation = GetActorLocation();
-	if(NewLocation.Y == 0)
-	{
-		NewLocation.Y = -150;
-	}
-	else if(NewLocation.Y == 150)
-	{
-		NewLocation.Y = 0;
-	}
+	NewLocation.Y -= 150;
+	NewLocation.Y = FMath::Max(-150, NewLocation.Y);
 	SetActorLocation(NewLocation);
 }
 
 void AEndlessCharacter::MoveRight()
 {
 	auto NewLocation = GetActorLocation();
-	if(NewLocation.Y == 0)
-	{
-		NewLocation.Y = 150;
-	}
-	else if(NewLocation.Y == -150)
-	{
-		NewLocation.Y = 0;
-	}
+	NewLocation.Y += 150;
+	NewLocation.Y = FMath::Min(150, NewLocation.Y);
 	SetActorLocation(NewLocation);
 }
 
