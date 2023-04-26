@@ -7,6 +7,9 @@
 #include "EndlessGameMode.generated.h"
 
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverDelegate);
+
 UCLASS()
 class ENDLESSCPP_API AEndlessGameMode : public AGameModeBase
 {
@@ -40,8 +43,20 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	float WorldMoveAmount = 30;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> WorldMoverBlueprint;
 	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+
+	int PlayerAmount = 1;
+	int PlayersDead = 0;
+
+	UFUNCTION()
+	void AddDeath();
+
+	UPROPERTY(BlueprintAssignable)
+	FGameOverDelegate OnGameOver;
 	
 };

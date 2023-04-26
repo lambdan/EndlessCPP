@@ -102,5 +102,6 @@ void AEndlessCharacter::Died()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Died in code"));
 	SetActorHiddenInGame(true);
+	this->SetActorEnableCollision(false);
 	Cast<AEndlessPlayerState>(GetPlayerState())->Died();
 }

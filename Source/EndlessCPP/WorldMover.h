@@ -7,7 +7,7 @@
 #include "EndlessGameMode.h"
 #include "WorldMover.generated.h"
 
-
+// class GameMode;
 
 UCLASS()
 class ENDLESSCPP_API AWorldMover : public AActor

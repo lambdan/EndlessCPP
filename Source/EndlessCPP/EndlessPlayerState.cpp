@@ -28,6 +28,7 @@ float AEndlessPlayerState::GetKilometersPerHour()
 
 void AEndlessPlayerState::SetWorldMover(AWorldMover* NewWorldMover)
 {
+	check(NewWorldMover != nullptr);
 	WorldMover = NewWorldMover;
 	WorldMover->SetSpeed(CurrentSpeedFactor);
 }

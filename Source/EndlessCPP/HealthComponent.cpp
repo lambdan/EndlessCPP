@@ -37,7 +37,7 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UHealthComponent::TakeDamage(int amount)
 {
-	if(CurrentlyInvincible) // I-frames
+	if(CurrentlyInvincible || CurrentHealth <= 0) // I-frames or already dead
 	{
 		return;
 	}

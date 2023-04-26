@@ -200,7 +200,7 @@ void AWorldMover::MoveWorld()
 	}
 
 
-	if (GetGameTimeSinceCreation() - LastObstacleOrCollectibleSpawn > (1 * GameMode->WorldMoveAmount / Speed))
+	if (GetGameTimeSinceCreation() - LastObstacleOrCollectibleSpawn > (1 * GameMode->StartingSpeedFactor / Speed))
 	{
 		SpawnObstacleOrCollectible();
 		SpawnEnemy();
@@ -219,7 +219,7 @@ void AWorldMover::MoveWorld()
 void AWorldMover::SetSpeed(float NewSpeed)
 {
 	Speed = NewSpeed;
-	UE_LOG(LogTemp, Warning, TEXT("%s speed is now %f"), *GetActorNameOrLabel(), Speed);
+	//UE_LOG(LogTemp, Warning, TEXT("%s speed is now %f"), *GetActorNameOrLabel(), Speed);
 }
 
 void AWorldMover::SetPlayerHurt(bool HurtState)
