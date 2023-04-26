@@ -1,7 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "EndlessCharacter.h"
+#include "EndlessPlayerState.h"
 
 // Sets default values
 AEndlessCharacter::AEndlessCharacter()
@@ -15,10 +13,12 @@ AEndlessCharacter::AEndlessCharacter()
 void AEndlessCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	UE_LOG(LogTemp, Warning, TEXT("Startposition is %f"), StartPosition.Y);
 	
 	HealthComponent = Cast<UHealthComponent>(GetComponentByClass(UHealthComponent::StaticClass()));
 	check(HealthComponent != nullptr);
 
+	HealthComponent->OnHealthChanged.AddDynamic(this, &AEndlessCharacter::UpdatePlayerHurtState);
 	HealthComponent->OnDied.AddDynamic(this, &AEndlessCharacter::Died);
 }
 
@@ -31,8 +31,15 @@ void AEndlessCharacter::Tick(float DeltaTime)
 // Called to bind functionality to input
 void AEndlessCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	// Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AEndlessCharacter::CollectCoin_Implementation(int Amount)
+{
+	IICollector::CollectCoin_Implementation(Amount);
+	Cast<AEndlessPlayerState>(GetPlayerState())->AddScore(Amount);
+	
 }
 
 void AEndlessCharacter::ReceiveDamage_Implementation(AActor* DamageCauser, int DamageAmount)
@@ -49,11 +56,16 @@ void AEndlessCharacter::ReceiveHeal_Implementation(int HealAmount)
 	// UE_LOG(LogTemp, Error, TEXT("Healed in code"));
 }
 
+void AEndlessCharacter::SetStartPosition(FVector NewStartPosition)
+{
+	StartPosition = NewStartPosition;
+}
+
 void AEndlessCharacter::MoveLeft()
 {
 	auto NewLocation = GetActorLocation();
 	NewLocation.Y -= 150;
-	NewLocation.Y = FMath::Max(-150, NewLocation.Y);
+	NewLocation.Y = FMath::Max(StartPosition.Y - 150, NewLocation.Y);
 	SetActorLocation(NewLocation);
 }
 
@@ -61,7 +73,7 @@ void AEndlessCharacter::MoveRight()
 {
 	auto NewLocation = GetActorLocation();
 	NewLocation.Y += 150;
-	NewLocation.Y = FMath::Min(150, NewLocation.Y);
+	NewLocation.Y = FMath::Min(StartPosition.Y + 150, NewLocation.Y);
 	SetActorLocation(NewLocation);
 }
 
@@ -79,10 +91,16 @@ void AEndlessCharacter::StandUp()
 	SetActorRotation(NewRotation);
 }
 
-void AEndlessCharacter::Died()
+void AEndlessCharacter::UpdatePlayerHurtState()
 {
-	// UE_LOG(LogTemp, Warning, TEXT("Died in code"));
-	SetActorHiddenInGame(true);
+	bool Hurt = HealthComponent->GetCurrentHealth() < HealthComponent->GetMaxHealth();
+	Cast<AEndlessPlayerState>(GetPlayerState())->WorldMover->SetPlayerHurt(Hurt);
 }
 
 
+void AEndlessCharacter::Died()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Died in code"));
+	SetActorHiddenInGame(true);
+	Cast<AEndlessPlayerState>(GetPlayerState())->Died();
+}

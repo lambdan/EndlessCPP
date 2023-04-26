@@ -69,9 +69,7 @@ public:
 	void SpawnEnemy();
 
 	AEndlessGameMode* GameMode;
-
-	UFUNCTION(BlueprintCallable)
-	void AddActorToMoveWithWorld(AActor* NewActor);
+	
 
 	UFUNCTION()
 	void MoveWorld();
@@ -79,5 +77,13 @@ public:
 	FTimerHandle WorldMoveTimerHandle;
 	FTimerDelegate WorldMoveTimerDelegate;
 
+	float Speed = 1.0;
+	bool PlayerIsHurt = false;
+	
+	UFUNCTION(BlueprintCallable)
+	void SetSpeed(float NewSpeed);
+
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerHurt(bool HurtState);
 
 };

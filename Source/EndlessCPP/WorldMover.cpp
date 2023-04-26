@@ -14,7 +14,7 @@ void AWorldMover::BeginPlay()
 	
 	
 	GameMode = (AEndlessGameMode*)GetWorld()->GetAuthGameMode();
-	GameMode->SetWorldMover(this);
+	// GameMode->SetWorldMover(this);
 	
 	SpawnedGroundPieces.Empty();
 	SpawnedObjects.Empty();
@@ -32,7 +32,8 @@ void AWorldMover::BeginPlay()
 FVector AWorldMover::CalculateGroundPieceSpawnPosition()
 {
 	if (SpawnedGroundPieces.IsEmpty()) { // first block (put it under the player)
-		return FVector(0,0,-150);
+		// return FVector(0,0,-150);
+		return this->GetActorLocation() + FVector(0,0,-150);
 	}
 	
 	// other blocks: based on last block
@@ -101,7 +102,7 @@ void AWorldMover::SpawnObstacleOrCollectible()
 		TSubclassOf<AActor> RandomizedThing;
 		if(FMath::RandRange(0.0f, 1.0f) <= CollectibleSpawnProbability)
 		{
-			if(GameMode->PlayerIsHurt()) // spawn heaalth is player is hurt
+			if(PlayerIsHurt) // spawn heaalth is player is hurt
 			{
 				RandomInt = FMath::RandRange(0, HealthBlueprints.Num() - 1);
 				RandomizedThing = HealthBlueprints[RandomInt];
@@ -159,12 +160,6 @@ void AWorldMover::SpawnEnemy()
 }
 
 
-void AWorldMover::AddActorToMoveWithWorld(AActor* NewActor)
-{
-	SpawnedObjects.Add(NewActor);
-}
-
-
 
 void AWorldMover::MoveWorld()
 {
@@ -181,7 +176,7 @@ void AWorldMover::MoveWorld()
 	// move ground towards the player
 	for (int i = 0; i < SpawnedGroundPieces.Num(); i++)
 	{
-		SpawnedGroundPieces[i]->AddActorWorldOffset(FVector(-GameMode->GetWorldMoveAmount(),0,0) * GameMode->GetSpeedFactor());
+		SpawnedGroundPieces[i]->AddActorWorldOffset(FVector(-GameMode->WorldMoveAmount,0,0) * Speed); // TODO REPLACE 1 WITH PLAYER SPEED FACTOR
 	}
 
 	// move collectibles/obstacles towards player
@@ -193,7 +188,7 @@ void AWorldMover::MoveWorld()
 			continue;
 		}
 
-		SpawnedObjects[i]->AddActorWorldOffset(FVector(-GameMode->GetWorldMoveAmount(),0,0) * GameMode->GetSpeedFactor());
+		SpawnedObjects[i]->AddActorWorldOffset(FVector(-GameMode->WorldMoveAmount,0,0) * Speed);
 
 		// check if object is behind player (remove it if so)
 		if (SpawnedObjects[i]->GetActorLocation().X <= -500)
@@ -205,18 +200,29 @@ void AWorldMover::MoveWorld()
 	}
 
 
-	if (GetGameTimeSinceCreation() - LastObstacleOrCollectibleSpawn > (1 * GameMode->GetStartingSpeedFactor() / GameMode->GetSpeedFactor()))
+	if (GetGameTimeSinceCreation() - LastObstacleOrCollectibleSpawn > (1 * GameMode->WorldMoveAmount / Speed))
 	{
 		SpawnObstacleOrCollectible();
 		SpawnEnemy();
 	}
 
-	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Yellow,
-	                                 FString::Printf(TEXT("Ground pieces in array: %i"), SpawnedGroundPieces.Num()));
-	GEngine->AddOnScreenDebugMessage(3, 1, FColor::Yellow,
-	                                 FString::Printf(
-		                                 TEXT("Collectibles/obstacles in array: %i"),
-		                                 SpawnedObjects.Num()));
-	GEngine->AddOnScreenDebugMessage(4, 1, FColor::Yellow,
-	                                 FString::Printf(TEXT("Speed factor: %f"), GameMode->GetSpeedFactor()));
+	// GEngine->AddOnScreenDebugMessage(0, 1, FColor::Yellow,
+	//                                  FString::Printf(TEXT("Ground pieces in array: %i"), SpawnedGroundPieces.Num()));
+	// GEngine->AddOnScreenDebugMessage(3, 1, FColor::Yellow,
+	//                                  FString::Printf(
+	// 	                                 TEXT("Collectibles/obstacles in array: %i"),
+	// 	                                 SpawnedObjects.Num()));
+	// GEngine->AddOnScreenDebugMessage(4, 1, FColor::Yellow,
+	//                                  FString::Printf(TEXT("Speed factor: %f"), GameMode->GetSpeedFactor()));
+}
+
+void AWorldMover::SetSpeed(float NewSpeed)
+{
+	Speed = NewSpeed;
+	UE_LOG(LogTemp, Warning, TEXT("%s speed is now %f"), *GetActorNameOrLabel(), Speed);
+}
+
+void AWorldMover::SetPlayerHurt(bool HurtState)
+{
+	PlayerIsHurt = HurtState;
 }
