@@ -28,22 +28,14 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Speed")
 	float StartingSpeedFactor = 1.0;
-	
+
 	UPROPERTY(EditAnywhere, Category="Speed")
-	float SpeedFactorDivisionFactor = 200;
+	float MinSpeedFactor = 1.0;
 
-	UPROPERTY(EditAnywhere, Category = "Scoring")
-	float ScoreTickRate = 0.1f;
-
-	UPROPERTY(EditAnywhere, Category = "Scoring")
-	int ScoreTickAmount = 1;
-
-	UPROPERTY(EditAnywhere, Category = "Speed")
-	float WorldMoveTickrate = 1.0 / 100.0;
+	UPROPERTY(EditAnywhere, Category="Speed")
+	float MaxSpeedFactor = 10.0;
 	
-	UPROPERTY(EditAnywhere)
-	float WorldMoveAmount = 30;
-
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> WorldMoverBlueprint;
 	

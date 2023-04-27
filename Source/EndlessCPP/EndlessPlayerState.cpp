@@ -22,12 +22,17 @@ void AEndlessPlayerState::BeginPlay()
 
 float AEndlessPlayerState::GetKilometersPerHour()
 {
-	return CurrentSpeedFactor * GameMode->WorldMoveAmount * (1/GameMode->WorldMoveTickrate) * 60 * 60 / 100000;
+	return CurrentSpeedFactor * 10.0 * (1/0.01) * 60.0 * 60.0 / 100000.0;
 }
 
 float AEndlessPlayerState::GetSpeedFactor()
 {
 	return CurrentSpeedFactor;
+}
+
+float AEndlessPlayerState::GetSpeedFactorPercentage()
+{
+	return CurrentSpeedFactor / GameMode->MaxSpeedFactor;
 }
 
 void AEndlessPlayerState::SetWorldMover(AWorldMover* NewWorldMover)
@@ -53,7 +58,7 @@ void AEndlessPlayerState::SetSpeedFactor(float NewSpeedFactor)
 void AEndlessPlayerState::ReduceSpeed(float Factor)
 {
 	CurrentSpeedFactor *= 1.0/Factor;
-	CurrentSpeedFactor = FMath::Max(1.0, CurrentSpeedFactor);
+	CurrentSpeedFactor = FMath::Max(GameMode->MinSpeedFactor, CurrentSpeedFactor);
 	SetSpeedFactor(CurrentSpeedFactor);
 }
 
@@ -67,7 +72,7 @@ void AEndlessPlayerState::AddScore(int Amount)
 void AEndlessPlayerState::AddSpeed(float Amount)
 {
 	CurrentSpeedFactor += Amount;
-	CurrentSpeedFactor = FMath::Min(10.0, CurrentSpeedFactor);
+	CurrentSpeedFactor = FMath::Min(GameMode->MaxSpeedFactor, CurrentSpeedFactor);
 	SetSpeedFactor(CurrentSpeedFactor);
 }
 

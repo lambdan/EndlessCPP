@@ -39,6 +39,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetSpeedFactor();
 
+	UFUNCTION(BlueprintPure)
+	float GetSpeedFactorPercentage();
+
 	UFUNCTION(BlueprintCallable)
 	void SetWorldMover(AWorldMover* NewWorldMover);
 

@@ -22,7 +22,7 @@ void AWorldMover::BeginPlay()
 	}
 	
 	WorldMoveTimerDelegate.BindUFunction(this, "MoveWorld");
-	GetWorld()->GetTimerManager().SetTimer(WorldMoveTimerHandle, WorldMoveTimerDelegate, GameMode->WorldMoveTickrate, true);
+	GetWorld()->GetTimerManager().SetTimer(WorldMoveTimerHandle, WorldMoveTimerDelegate, 0.01, true);
 }
 
 FVector AWorldMover::CalculateGroundPieceSpawnPosition()
@@ -173,7 +173,7 @@ void AWorldMover::MoveWorld()
 	// move ground towards the player
 	for (int i = 0; i < SpawnedGroundPieces.Num(); i++)
 	{
-		SpawnedGroundPieces[i]->AddActorWorldOffset(FVector(-GameMode->WorldMoveAmount,0,0) * Speed);
+		SpawnedGroundPieces[i]->AddActorWorldOffset(FVector(-10,0,0) * Speed);
 	}
 
 	// move collectibles/obstacles towards player
@@ -185,7 +185,7 @@ void AWorldMover::MoveWorld()
 			continue;
 		}
 
-		SpawnedObjects[i]->AddActorWorldOffset(FVector(-GameMode->WorldMoveAmount,0,0) * Speed);
+		SpawnedObjects[i]->AddActorWorldOffset(FVector(-10,0,0) * Speed);
 
 		// check if object is behind player (remove it if so)
 		if (SpawnedObjects[i]->GetActorLocation().X <= -500)
