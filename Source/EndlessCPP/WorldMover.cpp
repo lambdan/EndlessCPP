@@ -10,16 +10,12 @@ AWorldMover::AWorldMover()
 void AWorldMover::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
 	
 	GameMode = (AEndlessGameMode*)GetWorld()->GetAuthGameMode();
-	// GameMode->SetWorldMover(this);
 	
 	SpawnedGroundPieces.Empty();
 	SpawnedObjects.Empty();
 	
-
 	// generate starting pieces
 	for (int i = 0; i < BlocksAheadOfPlayer; i++) {
 		SpawnGroundPiece(CalculateGroundPieceSpawnPosition());
@@ -146,6 +142,7 @@ void AWorldMover::SpawnEnemy()
 	auto Location = PossibleLocations[LocationIndex];
 	FTransform SpawnTransform = FTransform(Location);
 	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = GetInstigator();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	auto RandomInt = FMath::RandRange(0, EnemyBlueprints.Num() - 1);
 	auto RandomizedThing = EnemyBlueprints[RandomInt];
@@ -176,7 +173,7 @@ void AWorldMover::MoveWorld()
 	// move ground towards the player
 	for (int i = 0; i < SpawnedGroundPieces.Num(); i++)
 	{
-		SpawnedGroundPieces[i]->AddActorWorldOffset(FVector(-GameMode->WorldMoveAmount,0,0) * Speed); // TODO REPLACE 1 WITH PLAYER SPEED FACTOR
+		SpawnedGroundPieces[i]->AddActorWorldOffset(FVector(-GameMode->WorldMoveAmount,0,0) * Speed);
 	}
 
 	// move collectibles/obstacles towards player
@@ -205,21 +202,11 @@ void AWorldMover::MoveWorld()
 		SpawnObstacleOrCollectible();
 		SpawnEnemy();
 	}
-
-	// GEngine->AddOnScreenDebugMessage(0, 1, FColor::Yellow,
-	//                                  FString::Printf(TEXT("Ground pieces in array: %i"), SpawnedGroundPieces.Num()));
-	// GEngine->AddOnScreenDebugMessage(3, 1, FColor::Yellow,
-	//                                  FString::Printf(
-	// 	                                 TEXT("Collectibles/obstacles in array: %i"),
-	// 	                                 SpawnedObjects.Num()));
-	// GEngine->AddOnScreenDebugMessage(4, 1, FColor::Yellow,
-	//                                  FString::Printf(TEXT("Speed factor: %f"), GameMode->GetSpeedFactor()));
 }
 
 void AWorldMover::SetSpeed(float NewSpeed)
 {
 	Speed = NewSpeed;
-	//UE_LOG(LogTemp, Warning, TEXT("%s speed is now %f"), *GetActorNameOrLabel(), Speed);
 }
 
 void AWorldMover::SetPlayerHurt(bool HurtState)

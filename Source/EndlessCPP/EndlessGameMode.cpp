@@ -50,13 +50,14 @@ void AEndlessGameMode::BeginPlay()
 			NewPlayer = UGameplayStatics::CreatePlayer(GetWorld(), i, true);
 		}
 		auto NewPawn = NewPlayer->GetPawnOrSpectator();
-		auto StartLocation = FVector(0, 1000*i, 0);
+		auto StartLocation = FVector(0, 2000*i, 0);
 		NewPawn->SetActorLocation(StartLocation);
 		auto Character = Cast<AEndlessCharacter>(NewPawn);
 		Character->SetStartPosition(StartLocation);
 
 		FTransform SpawnTransform = FTransform(StartLocation);
 		FActorSpawnParameters SpawnParams;
+		SpawnParams.Instigator = NewPawn;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		auto NewWorldMover = GetWorld()->SpawnActor<AWorldMover>(WorldMoverBlueprint, SpawnTransform, SpawnParams);
 

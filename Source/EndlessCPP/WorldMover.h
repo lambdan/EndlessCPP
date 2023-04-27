@@ -85,5 +85,5 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerHurt(bool HurtState);
-
+	
 };

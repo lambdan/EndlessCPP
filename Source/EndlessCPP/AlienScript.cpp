@@ -30,13 +30,12 @@ void AAlienScript::Tick(float DeltaTime)
 
 bool AAlienScript::UpdateRotation()
 {
-	auto PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator();
-	if(PlayerPawn==nullptr)
+	if(GetInstigator()==nullptr)
 	{
 		return false; // player is dead
 	}
 
-	auto PlayerLocation = PlayerPawn->GetActorLocation();
+	auto PlayerLocation = GetInstigator()->GetActorLocation();
 
 	auto NewRotation = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), PlayerLocation);
 
@@ -47,13 +46,14 @@ bool AAlienScript::UpdateRotation()
 
 void AAlienScript::TryFireAtPlayer()
 {
-	auto PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator();
-	if(PlayerPawn==nullptr)
+	if(GetInstigator()==nullptr)
 	{
-		return; 
+		return;
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("%s instigator: %s"), *this->GetActorNameOrLabel(), *GetInstigator()->GetActorNameOrLabel());
 	
-	auto PlayerLocation = PlayerPawn->GetActorLocation();
+	auto PlayerLocation = GetInstigator()->GetActorLocation();
 	auto DistanceToPlayer = FVector::Distance(this->GetActorLocation(), PlayerLocation);
 
 	if(DistanceToPlayer < DistanceToPlayerToStartFiring)
@@ -64,7 +64,8 @@ void AAlienScript::TryFireAtPlayer()
 		FTransform ProjectileSpawnTransform;
 		ProjectileSpawnTransform.SetLocation(SpawnLocation);
 		ProjectileSpawnTransform.SetRotation(this->GetActorQuat());
-		GetWorld()->SpawnActor<AActor>(AlienProjectileBlueprint, ProjectileSpawnTransform, ProjectileSpawnParams);
+		auto Projectile = GetWorld()->SpawnActor<AActor>(AlienProjectileBlueprint, ProjectileSpawnTransform, ProjectileSpawnParams);
+		
 	}
 }
 
