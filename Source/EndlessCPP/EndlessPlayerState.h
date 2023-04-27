@@ -11,6 +11,7 @@
 // class WorldMover;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FScoreUpdatedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSpeedUpdatedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverTriggered);
 
 /**
@@ -28,14 +29,15 @@ public:
 	
 	int64 Score = 0;
 	float CurrentSpeedFactor = 1.0;
-	float StartingSpeedFactor = 1.0;
-
-
+	
 	UFUNCTION(BlueprintPure)
 	int64 GetCurrentScore();
 	
 	UFUNCTION(BlueprintPure)
 	float GetKilometersPerHour();
+
+	UFUNCTION(BlueprintPure)
+	float GetSpeedFactor();
 
 	UFUNCTION(BlueprintCallable)
 	void SetWorldMover(AWorldMover* NewWorldMover);
@@ -48,15 +50,26 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void AddScore(int Amount);
+
+	UFUNCTION(BlueprintCallable)
+	void AddSpeed(float Amount);
+
+	
 	
 	UPROPERTY(BlueprintAssignable)
 	FScoreUpdatedDelegate OnScoreUpdatedDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FSpeedUpdatedDelegate OnSpeedUpdatedDelegate;
 
 	UPROPERTY(BlueprintAssignable)
 	FGameOverTriggered OnGameOver;
 
 	FTimerHandle AddScoreHandle;
 	FTimerDelegate AddScoreDelegate;
+
+	FTimerHandle AddSpeedHandle;
+	FTimerDelegate AddSpeedDelegate;
 	
 	virtual void BeginPlay() override;
 

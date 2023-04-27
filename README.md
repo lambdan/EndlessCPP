@@ -60,3 +60,9 @@ The ground pieces are pooled. It initially spawns a bunch of platforms, but when
 Further improvement would be to also pool the obstacles, collectibles and projectiles.
 
 Score is also counted and incremented through C++. Though, the HUD is updated through Blueprints.
+
+# Part 2 (Converting to Two Players)
+
+My biggest issue when reworking the code for 2 players was that I had initially done a lot of things in the Game Mode, like keeping track of score and speed. I moved most of the Game Mode logic into Player States instead.
+
+My second struggle was realizing it wasn't possible to use the same keyboard with 2 player controllers. My solution for this ended up being getting input inside the first player controller (which resides in the first player character) and then forward that to the second players character. Not an elegant solution but main point of this exercise wasn't dealing with input systems. I did atleast switch to using the new Enhanced Input System, IA's and IMC's.

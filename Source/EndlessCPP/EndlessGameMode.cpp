@@ -32,10 +32,7 @@ void AEndlessGameMode::AddDeath()
 
 void AEndlessGameMode::BeginPlay()
 {
-	Super::BeginPlay();
-
 	PlayersDead = 0;
-	
 	auto EndlessGameInstance = Cast<UEndlessGameInstance>(GetGameInstance());
 	PlayerAmount = EndlessGameInstance->GetPlayerAmount();
 	
@@ -68,4 +65,5 @@ void AEndlessGameMode::BeginPlay()
 		
 	}
 	
+	Super::BeginPlay();
 }
