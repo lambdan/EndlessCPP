@@ -82,6 +82,7 @@ void AEndlessPlayerState::Died()
 	GetWorld()->GetTimerManager().ClearTimer(AddSpeedHandle);
 	GetWorld()->GetTimerManager().ClearTimer(AddScoreHandle);
 	OnGameOver.Broadcast();
+	WorldMover->StopSpawning();
 }
 
 

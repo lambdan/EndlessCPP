@@ -85,5 +85,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerHurt(bool HurtState);
+
+
+	bool ShouldSpawn = true;
+	
+	UFUNCTION(BlueprintCallable)
+	void StopSpawning();
 	
 };

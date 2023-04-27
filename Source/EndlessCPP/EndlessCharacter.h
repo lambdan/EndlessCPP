@@ -37,6 +37,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetStartPosition(FVector NewStartPosition);
+
+	UFUNCTION(BlueprintCallable)
+	void CustomJump();
 	
 	UFUNCTION(BlueprintCallable)
 	void MoveLeft();

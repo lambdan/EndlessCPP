@@ -15,6 +15,7 @@ void AWorldMover::BeginPlay()
 	
 	SpawnedGroundPieces.Empty();
 	SpawnedObjects.Empty();
+	ShouldSpawn = true;
 	
 	// generate starting pieces
 	for (int i = 0; i < BlocksAheadOfPlayer; i++) {
@@ -68,7 +69,7 @@ void AWorldMover::SpawnGroundPiece(FVector Position)
 void AWorldMover::SpawnObstacleOrCollectible()
 {
 
-	LastObstacleOrCollectibleSpawn = GetGameTimeSinceCreation();
+	
 	
 	if(ObstacleBlueprints.IsEmpty())
 	{
@@ -199,8 +200,13 @@ void AWorldMover::MoveWorld()
 
 	if (GetGameTimeSinceCreation() - LastObstacleOrCollectibleSpawn > (1 * GameMode->StartingSpeedFactor / Speed))
 	{
-		SpawnObstacleOrCollectible();
-		SpawnEnemy();
+		LastObstacleOrCollectibleSpawn = GetGameTimeSinceCreation();
+		if(ShouldSpawn)
+		{
+			SpawnObstacleOrCollectible();
+			SpawnEnemy();
+		}
+		
 	}
 }
 
@@ -212,4 +218,13 @@ void AWorldMover::SetSpeed(float NewSpeed)
 void AWorldMover::SetPlayerHurt(bool HurtState)
 {
 	PlayerIsHurt = HurtState;
+}
+
+void AWorldMover::StopSpawning()
+{
+	ShouldSpawn = false;
+	for(auto & a : SpawnedObjects)
+	{
+		a->Destroy();
+	}
 }

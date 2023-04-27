@@ -17,7 +17,7 @@ void AEndlessCharacter::BeginPlay()
 	
 	HealthComponent = Cast<UHealthComponent>(GetComponentByClass(UHealthComponent::StaticClass()));
 	check(HealthComponent != nullptr);
-
+	
 	HealthComponent->OnHealthChanged.AddDynamic(this, &AEndlessCharacter::UpdatePlayerHurtState);
 	HealthComponent->OnDied.AddDynamic(this, &AEndlessCharacter::Died);
 }
@@ -61,8 +61,22 @@ void AEndlessCharacter::SetStartPosition(FVector NewStartPosition)
 	StartPosition = NewStartPosition;
 }
 
+void AEndlessCharacter::CustomJump()
+{
+	// this really isnt that custom, its just that i check if you're dead
+	if(HealthComponent->IsDead())
+	{
+		return;
+	}
+	this->Jump();
+}
+
 void AEndlessCharacter::MoveLeft()
 {
+	if(HealthComponent->IsDead())
+	{
+		return;
+	}
 	auto NewLocation = GetActorLocation();
 	NewLocation.Y -= 150;
 	NewLocation.Y = FMath::Max(StartPosition.Y - 150, NewLocation.Y);
@@ -71,6 +85,10 @@ void AEndlessCharacter::MoveLeft()
 
 void AEndlessCharacter::MoveRight()
 {
+	if(HealthComponent->IsDead())
+	{
+		return;
+	}
 	auto NewLocation = GetActorLocation();
 	NewLocation.Y += 150;
 	NewLocation.Y = FMath::Min(StartPosition.Y + 150, NewLocation.Y);
@@ -79,6 +97,10 @@ void AEndlessCharacter::MoveRight()
 
 void AEndlessCharacter::LieDown()
 {
+	if(HealthComponent->IsDead())
+	{
+		return;
+	}
 	auto NewRotation = GetActorRotation();
 	NewRotation.Pitch = 270;
 	SetActorRotation(NewRotation);
@@ -86,6 +108,10 @@ void AEndlessCharacter::LieDown()
 
 void AEndlessCharacter::StandUp()
 {
+	if(HealthComponent->IsDead())
+	{
+		return;
+	}
 	auto NewRotation = GetActorRotation();
 	NewRotation.Pitch = 0;
 	SetActorRotation(NewRotation);

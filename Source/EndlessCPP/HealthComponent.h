@@ -91,4 +91,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	int GetMaxHealth();
+
+	UFUNCTION(BlueprintPure)
+	bool IsDead();
 };

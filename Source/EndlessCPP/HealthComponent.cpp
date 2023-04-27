@@ -121,3 +121,8 @@ int UHealthComponent::GetMaxHealth()
 {
 	return MaxHealth;
 }
+
+bool UHealthComponent::IsDead()
+{
+	return CurrentHealth <= 0;
+}
