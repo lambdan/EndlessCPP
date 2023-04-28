@@ -29,6 +29,9 @@ public:
 	TSubclassOf<AActor> GroundPieceBlueprint;
 
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> OpenSpotBlueprint;
+
+	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<AActor>> ObstacleBlueprints;
 
 	UPROPERTY(EditAnywhere)
@@ -58,7 +61,14 @@ public:
 	TArray<AActor*> SpawnedGroundPieces;
 
 	UPROPERTY()
-	TArray<AActor*> SpawnedObjects;
+	TArray<AActor*> SpawnedCollectibles;
+
+	UPROPERTY()
+	TArray<AActor*> SpawnedObstacles;
+
+	UPROPERTY()
+	TArray<AActor*> SpawnedEnemies;
+	
 
 	UPROPERTY()
 	float LastObstacleOrCollectibleSpawn;
@@ -73,6 +83,9 @@ public:
 
 	UFUNCTION()
 	void MoveWorld();
+
+	UFUNCTION()
+	void MoveActors(TArray<AActor*>& ActorsArray);
 
 	FTimerHandle WorldMoveTimerHandle;
 	FTimerDelegate WorldMoveTimerDelegate;
@@ -91,5 +104,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void StopSpawning();
+
+	UFUNCTION(BlueprintCallable)
+	void DespawnEnemiesAndObstacles();
+	
 	
 };

@@ -6,12 +6,13 @@
 #include "HealthComponent.h"
 #include "ICollector.h"
 #include "IDamageable.h"
+#include "IDodger.h"
 #include "IHealable.h"
 #include "GameFramework/Character.h"
 #include "EndlessCharacter.generated.h"
 
 UCLASS()
-class ENDLESSCPP_API AEndlessCharacter : public ACharacter, public IIDamageable, public IIHealable, public IICollector
+class ENDLESSCPP_API AEndlessCharacter : public ACharacter, public IIDamageable, public IIHealable, public IICollector, public IIDodger
 {
 	GENERATED_BODY()
 
@@ -34,6 +35,9 @@ public:
 	virtual void CollectCoin_Implementation(int Amount) override;
 	virtual void ReceiveDamage_Implementation(AActor* DamageCauser, int DamageAmount) override;
 	virtual void ReceiveHeal_Implementation(int HealAmount) override;
+	virtual void Dodged_Implementation() override;
+	virtual void ResetDodges_Implementation() override;
+	
 
 	UFUNCTION(BlueprintCallable)
 	void SetStartPosition(FVector NewStartPosition);

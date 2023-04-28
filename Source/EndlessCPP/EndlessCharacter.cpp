@@ -13,13 +13,14 @@ AEndlessCharacter::AEndlessCharacter()
 void AEndlessCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("Startposition is %f"), StartPosition.Y);
+	// UE_LOG(LogTemp, Warning, TEXT("Startposition is %f"), StartPosition.Y);
 	
 	HealthComponent = Cast<UHealthComponent>(GetComponentByClass(UHealthComponent::StaticClass()));
 	check(HealthComponent != nullptr);
 	
 	HealthComponent->OnHealthChanged.AddDynamic(this, &AEndlessCharacter::UpdatePlayerHurtState);
 	HealthComponent->OnDied.AddDynamic(this, &AEndlessCharacter::Died);
+	
 }
 
 // Called every frame
@@ -38,6 +39,7 @@ void AEndlessCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void AEndlessCharacter::CollectCoin_Implementation(int Amount)
 {
 	IICollector::CollectCoin_Implementation(Amount);
+	Execute_Dodged(this);
 	Cast<AEndlessPlayerState>(GetPlayerState())->AddScore(Amount);
 	
 }
@@ -45,15 +47,28 @@ void AEndlessCharacter::CollectCoin_Implementation(int Amount)
 void AEndlessCharacter::ReceiveDamage_Implementation(AActor* DamageCauser, int DamageAmount)
 {
 	IIDamageable::ReceiveDamage_Implementation(DamageCauser, DamageAmount);
+	Execute_ResetDodges(this);
 	HealthComponent->TakeDamage(DamageAmount);
-	// UE_LOG(LogTemp, Error, TEXT("Took damage in code"));
 }
 
 void AEndlessCharacter::ReceiveHeal_Implementation(int HealAmount)
 {
 	IIHealable::ReceiveHeal_Implementation(HealAmount);
+	Execute_Dodged(this);
 	HealthComponent->RestoreHealth(HealAmount);
-	// UE_LOG(LogTemp, Error, TEXT("Healed in code"));
+}
+
+void AEndlessCharacter::Dodged_Implementation()
+{
+	IIDodger::Dodged_Implementation();
+	Cast<AEndlessPlayerState>(GetPlayerState())->AddDodge();
+}
+
+void AEndlessCharacter::ResetDodges_Implementation()
+{
+
+	IIDodger::ResetDodges_Implementation();
+	Cast<AEndlessPlayerState>(GetPlayerState())->ResetDodges();
 }
 
 void AEndlessCharacter::SetStartPosition(FVector NewStartPosition)

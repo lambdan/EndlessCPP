@@ -14,7 +14,9 @@ void AWorldMover::BeginPlay()
 	GameMode = (AEndlessGameMode*)GetWorld()->GetAuthGameMode();
 	
 	SpawnedGroundPieces.Empty();
-	SpawnedObjects.Empty();
+	SpawnedEnemies.Empty();
+	SpawnedCollectibles.Empty();
+	SpawnedObstacles.Empty();
 	ShouldSpawn = true;
 	
 	// generate starting pieces
@@ -68,15 +70,11 @@ void AWorldMover::SpawnGroundPiece(FVector Position)
 
 void AWorldMover::SpawnObstacleOrCollectible()
 {
-
-	
-	
 	if(ObstacleBlueprints.IsEmpty())
 	{
 		return; // no blueprints assigned
 	}
 	
-
 	TArray<FVector> PossibleLocations;
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 0, 150)); // middle
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 0, 300)); // middle top
@@ -85,7 +83,7 @@ void AWorldMover::SpawnObstacleOrCollectible()
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 150, 150)); // right
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 150, 300)); // right top
 
-	auto HowManyToSpawn = FMath::RandRange(0, PossibleLocations.Num()-1); // -1 to always leave one spot open
+	auto HowManyToSpawn = FMath::RandRange(3, PossibleLocations.Num()-1); // -1 to always leave one spot open
 	
 	for (int i = 0; i < HowManyToSpawn; i++)
 	{
@@ -108,22 +106,49 @@ void AWorldMover::SpawnObstacleOrCollectible()
 				RandomInt = FMath::RandRange(0, CollectibleBlueprints.Num() - 1);
 				RandomizedThing = CollectibleBlueprints[RandomInt];
 			}
+			
+			auto NewSpawn = GetWorld()->SpawnActor<AActor>(RandomizedThing, SpawnTransform, SpawnParams);
+			if(NewSpawn)
+			{
+				SpawnedCollectibles.Add(NewSpawn);
+				UE_LOG(LogTemp, Warning, TEXT("Spawned %s"), *NewSpawn->GetActorNameOrLabel());
+				PossibleLocations.RemoveAt(LocationIndex);
+			}
 		} else
 		{
 			// spawn obstacle
 			RandomInt = FMath::RandRange(0, ObstacleBlueprints.Num() - 1);
 			RandomizedThing = ObstacleBlueprints[RandomInt];
+			auto NewSpawn = GetWorld()->SpawnActor<AActor>(RandomizedThing, SpawnTransform, SpawnParams);
+			if(NewSpawn)
+			{
+				SpawnedObstacles.Add(NewSpawn);
+				UE_LOG(LogTemp, Warning, TEXT("Spawned %s"), *NewSpawn->GetActorNameOrLabel());
+				PossibleLocations.RemoveAt(LocationIndex);
+			}
 		}
 		
-		auto NewSpawn = GetWorld()->SpawnActor<AActor>(RandomizedThing, SpawnTransform, SpawnParams);
-		if(NewSpawn)
-		{
-			SpawnedObjects.Add(NewSpawn);
-			UE_LOG(LogTemp, Warning, TEXT("Spawned %s"), *NewSpawn->GetActorNameOrLabel());
-			PossibleLocations.RemoveAt(LocationIndex);
-		}
+
 		
 	}
+
+	if (HowManyToSpawn > 0)
+	{
+		// fill in the blank spots with invisible triggers
+		for (auto& a : PossibleLocations)
+		{
+			FTransform SpawnTransform = FTransform(a);
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			auto NewSpawn = GetWorld()->SpawnActor<AActor>(OpenSpotBlueprint, SpawnTransform, SpawnParams);
+			if (NewSpawn)
+			{
+				SpawnedObstacles.Add(NewSpawn);
+				UE_LOG(LogTemp, Warning, TEXT("Spawned %s"), *NewSpawn->GetActorNameOrLabel());
+			}
+		}
+	}
+	
 }
 
 void AWorldMover::SpawnEnemy()
@@ -150,7 +175,7 @@ void AWorldMover::SpawnEnemy()
 	auto NewSpawn = GetWorld()->SpawnActor<AActor>(RandomizedThing, SpawnTransform, SpawnParams);
 	if (NewSpawn)
 	{
-		SpawnedObjects.Add(NewSpawn);
+		SpawnedEnemies.Add(NewSpawn);
 		UE_LOG(LogTemp, Warning, TEXT("Spawned %s"), *NewSpawn->GetActorNameOrLabel());
 		PossibleLocations.RemoveAt(LocationIndex);
 	}
@@ -176,28 +201,11 @@ void AWorldMover::MoveWorld()
 	{
 		SpawnedGroundPieces[i]->AddActorWorldOffset(FVector(-10,0,0) * Speed);
 	}
-
-	// move collectibles/obstacles towards player
-	for (int i = 0; i < SpawnedObjects.Num(); i++)
-	{
-		if (SpawnedObjects[i] == nullptr)
-		{
-			SpawnedObjects.RemoveAt(i);
-			continue;
-		}
-
-		SpawnedObjects[i]->AddActorWorldOffset(FVector(-10,0,0) * Speed);
-
-		// check if object is behind player (remove it if so)
-		if (SpawnedObjects[i]->GetActorLocation().X <= -500)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("%s is behind player. Destroying"), *SpawnedObjects[i]->GetActorNameOrLabel());
-			SpawnedObjects[i]->Destroy();
-			SpawnedObjects.RemoveAt(i);
-		}
-	}
-
-
+	
+	MoveActors(SpawnedObstacles);
+	MoveActors(SpawnedEnemies);
+	MoveActors(SpawnedCollectibles);
+	
 	if (GetGameTimeSinceCreation() - LastObstacleOrCollectibleSpawn > (1 * GameMode->StartingSpeedFactor / Speed))
 	{
 		LastObstacleOrCollectibleSpawn = GetGameTimeSinceCreation();
@@ -207,6 +215,28 @@ void AWorldMover::MoveWorld()
 			SpawnEnemy();
 		}
 		
+	}
+}
+
+void AWorldMover::MoveActors(TArray<AActor*>& ActorsArray)
+{
+	for (int i = 0; i < ActorsArray.Num(); i++)
+	{
+		if (ActorsArray[i] == nullptr)
+		{
+			ActorsArray.RemoveAt(i);
+			continue;
+		}
+
+		ActorsArray[i]->AddActorWorldOffset(FVector(-10,0,0) * Speed);
+
+		// check if object is behind player (remove it if so)
+		if (ActorsArray[i]->GetActorLocation().X <= -500)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s is behind player. Destroying"), *ActorsArray[i]->GetActorNameOrLabel());
+			ActorsArray[i]->Destroy();
+			ActorsArray.RemoveAt(i);
+		}
 	}
 }
 
@@ -223,8 +253,18 @@ void AWorldMover::SetPlayerHurt(bool HurtState)
 void AWorldMover::StopSpawning()
 {
 	ShouldSpawn = false;
-	for(auto & a : SpawnedObjects)
+}
+
+void AWorldMover::DespawnEnemiesAndObstacles()
+{
+	for(auto & a : SpawnedEnemies)
+	{
+		a->Destroy();
+	}
+	for(auto & a : SpawnedObstacles)
 	{
 		a->Destroy();
 	}
 }
+
+

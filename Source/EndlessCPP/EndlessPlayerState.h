@@ -12,6 +12,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FScoreUpdatedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSpeedUpdatedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDodgesUpdatedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverTriggered);
 
 /**
@@ -29,6 +30,8 @@ public:
 	
 	int64 Score = 0;
 	float CurrentSpeedFactor = 1.0;
+	int Dodges = 0;
+	float LastDodge;
 	
 	UFUNCTION(BlueprintPure)
 	int64 GetCurrentScore();
@@ -41,6 +44,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	float GetSpeedFactorPercentage();
+
+	UFUNCTION(BlueprintPure)
+	int GetDodges();
 
 	UFUNCTION(BlueprintCallable)
 	void SetWorldMover(AWorldMover* NewWorldMover);
@@ -57,7 +63,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddSpeed(float Amount);
 
-	
+	UFUNCTION(BlueprintCallable)
+	void AddDodge();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetDodges();
 	
 	UPROPERTY(BlueprintAssignable)
 	FScoreUpdatedDelegate OnScoreUpdatedDelegate;
@@ -73,6 +83,9 @@ public:
 
 	FTimerHandle AddSpeedHandle;
 	FTimerDelegate AddSpeedDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FDodgesUpdatedDelegate OnDodgesUpdatedDelegate;
 	
 	virtual void BeginPlay() override;
 

@@ -35,6 +35,11 @@ float AEndlessPlayerState::GetSpeedFactorPercentage()
 	return CurrentSpeedFactor / GameMode->MaxSpeedFactor;
 }
 
+int AEndlessPlayerState::GetDodges()
+{
+	return Dodges;
+}
+
 void AEndlessPlayerState::SetWorldMover(AWorldMover* NewWorldMover)
 {
 	WorldMover = NewWorldMover;
@@ -65,7 +70,7 @@ void AEndlessPlayerState::ReduceSpeed(float Factor)
 
 void AEndlessPlayerState::AddScore(int Amount)
 {
-	Score += Amount * CurrentSpeedFactor;
+	Score += Amount;
 	OnScoreUpdatedDelegate.Broadcast();
 }
 
@@ -74,6 +79,34 @@ void AEndlessPlayerState::AddSpeed(float Amount)
 	CurrentSpeedFactor += Amount;
 	CurrentSpeedFactor = FMath::Min(GameMode->MaxSpeedFactor, CurrentSpeedFactor);
 	SetSpeedFactor(CurrentSpeedFactor);
+}
+
+void AEndlessPlayerState::AddDodge()
+{
+	if(GetGameTimeSinceCreation() < (LastDodge + 0.1f))
+	{
+		return; // prevent double dodge 
+	}
+
+	LastDodge = GetGameTimeSinceCreation();
+	Dodges += 1;
+	OnDodgesUpdatedDelegate.Broadcast();
+
+	if(Dodges % 5 == 0)
+	{
+		AddScore(100*Dodges);
+
+		if(FMath::RandRange(0.0,1.0) <= 0.2) // 20% chance to despawn all bad things
+		{
+			WorldMover->DespawnEnemiesAndObstacles();
+		}
+	}
+}
+
+void AEndlessPlayerState::ResetDodges()
+{
+	Dodges = 0;
+	OnDodgesUpdatedDelegate.Broadcast();
 }
 
 
