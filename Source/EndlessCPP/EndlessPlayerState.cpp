@@ -92,11 +92,11 @@ void AEndlessPlayerState::AddDodge()
 	Dodges += 1;
 	OnDodgesUpdatedDelegate.Broadcast();
 
-	if(Dodges % 5 == 0)
+	if(Dodges % GameMode->RewardEveryNDodges == 0)
 	{
-		AddScore(100*Dodges);
+		AddScore(GameMode->BonusPointsForDodging * Dodges);
 
-		if(FMath::RandRange(0.0,1.0) <= 0.2) // 20% chance to despawn all bad things
+		if(FMath::RandRange(0.0,1.0) <= GameMode->DespawnObstaclesChance )
 		{
 			WorldMover->DespawnEnemiesAndObstacles();
 		}

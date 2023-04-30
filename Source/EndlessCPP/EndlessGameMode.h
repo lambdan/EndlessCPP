@@ -34,6 +34,16 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Speed")
 	float MaxSpeedFactor = 10.0;
+
+	UPROPERTY(EditAnywhere, Category="Rewarding")
+	int RewardEveryNDodges = 5;
+
+	/* Will be multiplied by combo (eg 5x combo means rewarded score is 5*this value) */
+	UPROPERTY(EditAnywhere, Category="Rewarding")
+	int BonusPointsForDodging = 100;
+	
+	UPROPERTY(EditAnywhere, Category="Rewarding")
+	float DespawnObstaclesChance = 0.2;
 	
 	
 	UPROPERTY(EditAnywhere)
