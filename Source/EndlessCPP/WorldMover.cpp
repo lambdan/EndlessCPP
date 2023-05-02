@@ -83,7 +83,7 @@ void AWorldMover::SpawnObstacleOrCollectible()
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 150, 150)); // right
 	PossibleLocations.Add(CalculateGroundPieceSpawnPosition() + FVector(0, 150, 300)); // right top
 
-	auto HowManyToSpawn = FMath::RandRange(3, PossibleLocations.Num()-1); // -1 to always leave one spot open
+	auto HowManyToSpawn = FMath::RandRange(1, PossibleLocations.Num()-1); // -1 to always leave one spot open
 	
 	for (int i = 0; i < HowManyToSpawn; i++)
 	{
