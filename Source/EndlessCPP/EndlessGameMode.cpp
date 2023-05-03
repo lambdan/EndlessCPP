@@ -41,7 +41,7 @@ void AEndlessGameMode::BeginPlay()
 	for(int i = 0; i < PlayerAmount; i++)
 	{
 		auto NewPlayer = UGameplayStatics::GetPlayerController(GetWorld(), i);
-		if (NewPlayer == nullptr)
+		if (NewPlayer == nullptr) // because player 0 will exist already, but player 1 wont
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Creating player for id %i"), i);
 			NewPlayer = UGameplayStatics::CreatePlayer(GetWorld(), i, true);
